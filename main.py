@@ -50,6 +50,10 @@ def despense_tile(gcode, tile_index):
     gcode.travel((-PUSHER_LENGTH,0,0), feedrate=1000)
     gcode.travel((PUSHER_LENGTH,0,0), feedrate=1000)
 
+    # prevent the tile from getting stuck
+    gcode.travel((-PUSHER_LENGTH/2.9,0,0), feedrate=300)
+    gcode.travel((PUSHER_LENGTH/2.9,0,0))
+
 def move_to_mossaic(gcode, row, col):
     """
     Moves the print head to the mossaic and places the tile
