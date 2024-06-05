@@ -16,15 +16,15 @@ SAFE_RANGE = {
     'z': {'MIN':34.6, 'MAX':175}
 }
 # Adjust x and y as needed
-DESPENSER_COORD = (188.5,159.6,SAFE_RANGE['z']['MIN'])
+DESPENSER_COORD = (187.1,160,SAFE_RANGE['z']['MIN'])
 BUILD_DIR = "build/"
 
 MOSSAIC = [
     [0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0],
-    [0, 0, 2, 0, 0],
-    [0, 0, 0, 3, 0],
-    [0, 0, 0, 0, 4]
+    [1, 1, 1, 1, 1],
+    [2, 2, 2, 2, 2],
+    [3, 3, 3, 3, 3],
+    [4, 4, 4, 4, 4]
 ]
 
 def setup(gcode):
@@ -34,7 +34,7 @@ def setup(gcode):
     gcode.file.write("M420 S1\n")
 
     # center the print head
-    gcode.travel_absolute((89,115,SAFE_RANGE['z']['MIN']+FEEDER_CLEARANCE))
+    gcode.travel_absolute((89,115,SAFE_RANGE['z']['MIN']))
     gcode.file.write("M0 S10 Press button to continue.\n")
 
 def end(gcode):
@@ -73,6 +73,9 @@ def square_test(gcode):
     # travel diagonally
     gcode.travel((SAFE_RANGE['x']['MAX']-SAFE_RANGE['x']['MIN'],SAFE_RANGE['y']['MAX']-SAFE_RANGE['y']['MIN'],0))
 
+def is_clear(z):
+    return z >= SAFE_RANGE['z']['MIN'] + FEEDER_CLEARANCE
+
 def main():
     os.makedirs(BUILD_DIR, exist_ok=True)
     g = Gcode(f"{BUILD_DIR}/test.gcode")
@@ -82,7 +85,8 @@ def main():
     
     for i, row in enumerate(MOSSAIC):
         for j, tile_index in enumerate(row):
-            g.travel((0,0,FEEDER_CLEARANCE))
+            if not is_clear(g.get_z()):
+                g.travel((0,0,FEEDER_CLEARANCE))
             g.travel_absolute((DESPENSER_COORD[0], DESPENSER_COORD[1],g.get_z()), feedrate=3000)
             despense_tile(g, tile_index)
             move_to_mossaic(g, i, j)
