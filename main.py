@@ -63,16 +63,6 @@ def move_to_mossaic(gcode, row, col):
     # Move print head to mossaic
     gcode.travel_absolute((SAFE_RANGE['x']['MIN']+col*HOLE_DISTANCE,SAFE_RANGE['y']['MIN']+row*HOLE_DISTANCE,SAFE_RANGE['z']['MIN']))
 
-def square_test(gcode):
-    # traval in a square
-    gcode.travel_absolute((SAFE_RANGE['x']['MIN'],SAFE_RANGE['y']['MIN'],SAFE_RANGE['z']['MIN']))
-    gcode.travel((0,SAFE_RANGE['y']['MAX']-SAFE_RANGE['y']['MIN'],0))
-    gcode.travel((SAFE_RANGE['x']['MAX']-SAFE_RANGE['x']['MIN'],0,0))
-    gcode.travel((0,SAFE_RANGE['y']['MIN']-SAFE_RANGE['y']['MAX'],0))
-    gcode.travel((SAFE_RANGE['x']['MIN']-SAFE_RANGE['x']['MAX'],0,0))
-    # travel diagonally
-    gcode.travel((SAFE_RANGE['x']['MAX']-SAFE_RANGE['x']['MIN'],SAFE_RANGE['y']['MAX']-SAFE_RANGE['y']['MIN'],0))
-
 def is_clear(z):
     return z >= SAFE_RANGE['z']['MIN'] + FEEDER_CLEARANCE
 
@@ -81,7 +71,6 @@ def main():
     g = Gcode(f"{BUILD_DIR}/test.gcode")
 
     setup(g)
-    # square_test(g)
     
     for i, row in enumerate(MOSSAIC):
         for j, tile_index in enumerate(row):
