@@ -28,7 +28,7 @@ MOSSAIC = [
 ]
 
 def setup(gcode):
-     # home print head
+     # home print head skip z if already homed to save time
     gcode.file.write("G28 X Y\n")
     gcode.file.write("G28 O\n")
     gcode.file.write("M420 S1\n")
