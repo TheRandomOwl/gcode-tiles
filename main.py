@@ -1,7 +1,6 @@
 """
 GCODE info: https://marlinfw.org/meta/gcode/
 """
-import numpy as np
 import os
 from gcodepy.gcode import Gcode
 
@@ -22,10 +21,10 @@ BUILD_DIR = "build/"
 
 MOSSAIC = [
     [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0]
+    [0, 1, 0, 0, 0],
+    [0, 0, 2, 0, 0],
+    [0, 0, 0, 3, 0],
+    [0, 0, 0, 0, 4]
 ]
 
 def setup(gcode):
@@ -44,6 +43,7 @@ def end(gcode):
 
 def despense_tile(gcode, tile_index):
     """
+    Move x and y to the despenser side before using this function
     Moves the print head to the despenser and despenses a tile
     """
     gcode.travel_absolute((DESPENSER_COORD[0], DESPENSER_COORD[1]-tile_index*HOLE_DISTANCE, SAFE_RANGE['z']['MIN']))
@@ -53,6 +53,7 @@ def despense_tile(gcode, tile_index):
 def move_to_mossaic(gcode, row, col):
     """
     Moves the print head to the mossaic and places the tile
+    Run after despense_tile
     """
     gcode.travel((0,0,FEEDER_CLEARANCE))
     # Move print head over feeder
@@ -79,20 +80,13 @@ def main():
     setup(g)
     # square_test(g)
     
-    # for i, row in enumerate(MOSSAIC):
-    #     for j, tile_index in enumerate(row):
-    #         g.travel((0,0,FEEDER_CLEARANCE))
-    #         g.travel_absolute((DESPENSER_COORD[0], DESPENSER_COORD[1],g.get_z()), feedrate=3000)
-    #         despense_tile(g, tile_index)
-    #         move_to_mossaic(g, i, j)
+    for i, row in enumerate(MOSSAIC):
+        for j, tile_index in enumerate(row):
+            g.travel((0,0,FEEDER_CLEARANCE))
+            g.travel_absolute((DESPENSER_COORD[0], DESPENSER_COORD[1],g.get_z()), feedrate=3000)
+            despense_tile(g, tile_index)
+            move_to_mossaic(g, i, j)
 
-    """   
-    for i in range(5):
-        despense_tile(g, i)
-    """
-    g.travel_absolute((190, 160, g.get_z()))
-    despense_tile(g, 0)
-    move_to_mossaic(g, 0, 0)
     end(g)
     
     # print the gcode to the console
