@@ -12,7 +12,7 @@ HOLE_SIZE = 12
 HOLE_DISTANCE = 16
 SAFE_RANGE = {
     'x': {'MIN':-10, 'MAX':190},
-    'y': {'MIN':0.5, 'MAX':215},
+    'y': {'MIN':9, 'MAX':215},
     'z': {'MIN':34.6, 'MAX':175}
 }
 # Adjust x and y as needed
