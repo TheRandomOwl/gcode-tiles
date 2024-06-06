@@ -28,12 +28,12 @@ MOSSAIC = [
 ]
 
 def setup(gcode):
-     # home print head skip z if already homed to save time
+    # home print head skip z if already homed to save time
     gcode.file.write("G28 X Y\n")
     gcode.file.write("G28 O\n")
     gcode.file.write("M420 S1\n")
 
-    # center the print head
+    # center the print head and give time to attach the pusher
     gcode.travel_absolute((89,115,SAFE_RANGE['z']['MIN']))
     gcode.file.write("M0 S10 Press button to continue.\n")
 
@@ -59,6 +59,7 @@ def move_to_mossaic(gcode, row, col):
     Moves the print head to the mossaic and places the tile
     Run after despense_tile
     """
+    # Move print head over feeder
     gcode.travel((0,0,FEEDER_CLEARANCE))
     # Move print head over feeder
     gcode.travel((-(PUSHER_LENGTH+2*FEEDER_WALL+HOLE_SIZE+3.3),0,0))
