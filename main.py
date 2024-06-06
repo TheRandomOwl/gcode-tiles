@@ -6,25 +6,27 @@ from gcodepy.gcode import Gcode
 
 # Constants
 PUSHER_LENGTH = 24
+PUSHER_WIDTH = 8
 FEEDER_CLEARANCE = 30
-FEEDER_WALL = 3.2
-HOLE_SIZE = 12
+FEEDER_WIDTH = 22.5
 HOLE_DISTANCE = 16
+TILE_SIZE = 10.6
+TILE_SPACING = 2
 SAFE_RANGE = {
     'x': {'MIN':-10, 'MAX':190},
     'y': {'MIN':9, 'MAX':215},
     'z': {'MIN':34.5, 'MAX':175}
 }
 # Adjust x and y as needed
-DESPENSER_COORD = (186.9,143.8,SAFE_RANGE['z']['MIN'])
-BUILD_DIR = "build/"
+DESPENSER_COORD = (187,143.8,SAFE_RANGE['z']['MIN'])
 
+BUILD_DIR = "build/"
 MOSSAIC = [
-    [0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1],
-    [2, 2, 2, 2, 2],
-    [3, 3, 3, 3, 3],
-    [4, 4, 4, 4, 4]
+    [0, 1, 2, 3, 4],
+    [0, 1, 2, 3, 4],
+    [0, 1, 2, 3, 4],
+    [0, 1, 2, 3, 4],
+    [0, 1, 2, 3, 4]
 ]
 
 def setup(gcode):
@@ -61,12 +63,12 @@ def move_to_mossaic(gcode, row, col):
     """
     # Move print head over feeder
     gcode.travel((0,0,FEEDER_CLEARANCE))
-    # Move print head over feeder
-    gcode.travel((-(PUSHER_LENGTH+2*FEEDER_WALL+HOLE_SIZE+3.3),0,0))
-    gcode.travel_absolute((gcode.get_x(),gcode.get_y()+HOLE_DISTANCE,SAFE_RANGE['z']['MIN']))
+    gcode.travel((-(PUSHER_LENGTH+FEEDER_WIDTH),0,0))
+    gcode.travel_absolute((gcode.get_x(),gcode.get_y()+PUSHER_WIDTH,SAFE_RANGE['z']['MIN']))
 
     # Move print head to mossaic
-    gcode.travel_absolute((SAFE_RANGE['x']['MIN']+col*HOLE_DISTANCE,SAFE_RANGE['y']['MIN']+row*HOLE_DISTANCE,SAFE_RANGE['z']['MIN']))
+    delta = TILE_SIZE + TILE_SPACING
+    gcode.travel_absolute((SAFE_RANGE['x']['MIN']+col*delta, SAFE_RANGE['y']['MIN']+row*delta, SAFE_RANGE['z']['MIN']))
 
 def is_clear(z):
     return z >= SAFE_RANGE['z']['MIN'] + FEEDER_CLEARANCE
@@ -80,7 +82,7 @@ def main():
     for i, row in enumerate(MOSSAIC):
         for j, tile_index in enumerate(row):
             if not is_clear(g.get_z()):
-                g.travel((0,0,FEEDER_CLEARANCE))
+                g.travel((0,0,FEEDER_CLEARANCE+SAFE_RANGE["z"]["MIN"]-g.get_z()))
             g.travel_absolute((DESPENSER_COORD[0], DESPENSER_COORD[1],g.get_z()), feedrate=3000)
             despense_tile(g, tile_index)
             move_to_mossaic(g, i, j)
