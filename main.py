@@ -13,10 +13,10 @@ HOLE_DISTANCE = 16
 SAFE_RANGE = {
     'x': {'MIN':-10, 'MAX':190},
     'y': {'MIN':9, 'MAX':215},
-    'z': {'MIN':34.6, 'MAX':175}
+    'z': {'MIN':34.5, 'MAX':175}
 }
 # Adjust x and y as needed
-DESPENSER_COORD = (187.1,160,SAFE_RANGE['z']['MIN'])
+DESPENSER_COORD = (186.9,143.8,SAFE_RANGE['z']['MIN'])
 BUILD_DIR = "build/"
 
 MOSSAIC = [
