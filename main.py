@@ -18,7 +18,6 @@ X_MAX = 190
 Y_MIN = 9
 Y_MAX = 215
 Z_MIN = 34.5
-Z_MAX = 175
 
 # Adjust x and y as needed
 DESPENSER_COORD = (187,143.8,Z_MIN)
