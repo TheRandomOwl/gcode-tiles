@@ -37,7 +37,7 @@ def setup(gcode):
     gcode.file.write("G28 O\n")
     gcode.file.write("M420 S1\n")
 
-    # center the print head and give time to attach the pusher
+    # prepare the print head and give time to attach the pusher
     gcode.travel_absolute((141.8,Y_MAX,PUSHER_TRAVEL_HIGHT+Z_MIN))
     gcode.travel((X_MAX-gcode.get_x(),0,0))
     gcode.file.write("M0 S10 Press button to continue.\n")
