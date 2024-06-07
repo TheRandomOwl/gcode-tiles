@@ -13,6 +13,7 @@ FEEDER_WIDTH = 22.5
 HOLE_DISTANCE = 16
 TILE_SIZE = 10.6
 TILE_SPACING = 2
+PUSHER_CLEARANCE_Y = 94
 X_MIN = -10
 X_MAX = 190
 Y_MIN = 9
@@ -66,7 +67,7 @@ def move_to_mossaic(gcode, row, col):
     """
     # Move print head around feeder
     tile_location = (gcode.get_x()-(FEEDER_WIDTH+PUSHER_LENGTH),gcode.get_y()+PUSHER_WIDTH,PUSHER_TRAVEL_HIGHT+Z_MIN)
-    gcode.travel_absolute((gcode.get_x(),Y_MIN,PUSHER_TRAVEL_HIGHT+Z_MIN), feedrate=6000)
+    gcode.travel_absolute((gcode.get_x(),PUSHER_CLEARANCE_Y,PUSHER_TRAVEL_HIGHT+Z_MIN), feedrate=6000)
     gcode.travel((-(PUSHER_LENGTH+FEEDER_WIDTH),0,0), feedrate=6000)
     gcode.travel_absolute(tile_location, feedrate=6000)
     gcode.travel((0,0,-PUSHER_TRAVEL_HIGHT))
