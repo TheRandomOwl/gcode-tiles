@@ -20,7 +20,7 @@ Y_MAX = 215
 Z_MIN = 34.5
 
 # Adjust x and y as needed
-DESPENSER_COORD = (187,143.8,Z_MIN)
+DESPENSER_COORD = (186.6,193.6,Z_MIN)
 
 BUILD_DIR = "build/"
 MOSSAIC = [
