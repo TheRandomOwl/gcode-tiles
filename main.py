@@ -8,6 +8,7 @@ from gcodepy.gcode import Gcode
 PUSHER_LENGTH = 24
 PUSHER_WIDTH = 8
 FEEDER_CLEARANCE = 30
+PUSHER_TRAVEL_HIGHT = 10
 FEEDER_WIDTH = 22.5
 HOLE_DISTANCE = 16
 TILE_SIZE = 10.6
@@ -36,7 +37,8 @@ def setup(gcode):
     gcode.file.write("M420 S1\n")
 
     # center the print head and give time to attach the pusher
-    gcode.travel_absolute((89,115,SAFE_RANGE['z']['MIN']))
+    gcode.travel_absolute((141.8,SAFE_RANGE['y']['MAX'],PUSHER_TRAVEL_HIGHT+SAFE_RANGE['z']['MIN']))
+    gcode.travel((SAFE_RANGE['x']['MAX']-gcode.get_x(),0,0))
     gcode.file.write("M0 S10 Press button to continue.\n")
 
 def end(gcode):
@@ -45,10 +47,10 @@ def end(gcode):
 
 def despense_tile(gcode, tile_index):
     """
-    Move x and y to the despenser side before using this function
+    Move x to the despenser side before using this function
     Moves the print head to the despenser and despenses a tile
     """
-    gcode.travel_absolute((DESPENSER_COORD[0], DESPENSER_COORD[1]-tile_index*HOLE_DISTANCE, SAFE_RANGE['z']['MIN']))
+    gcode.travel_absolute((DESPENSER_COORD[0], DESPENSER_COORD[1]-tile_index*HOLE_DISTANCE, SAFE_RANGE['z']['MIN']), feedrate=6000)
     gcode.travel((-PUSHER_LENGTH,0,0), feedrate=1000)
     gcode.travel((PUSHER_LENGTH,0,0), feedrate=1000)
 
@@ -61,17 +63,20 @@ def move_to_mossaic(gcode, row, col):
     Moves the print head to the mossaic and places the tile
     Run after despense_tile
     """
-    # Move print head over feeder
-    gcode.travel((0,0,FEEDER_CLEARANCE))
-    gcode.travel((-(PUSHER_LENGTH+FEEDER_WIDTH),0,0))
-    gcode.travel_absolute((gcode.get_x(),gcode.get_y()+PUSHER_WIDTH,SAFE_RANGE['z']['MIN']))
+    # Move print head around feeder
+    tile_location = (gcode.get_x()-(FEEDER_WIDTH+PUSHER_LENGTH),gcode.get_y()+PUSHER_WIDTH,PUSHER_TRAVEL_HIGHT+SAFE_RANGE['z']['MIN'])
+    gcode.travel_absolute((gcode.get_x(),SAFE_RANGE['y']['MIN'],PUSHER_TRAVEL_HIGHT+SAFE_RANGE['z']['MIN']), feedrate=6000)
+    gcode.travel((-(PUSHER_LENGTH+FEEDER_WIDTH),0,0), feedrate=6000)
+    gcode.travel_absolute(tile_location, feedrate=6000)
+    gcode.travel((0,0,-PUSHER_TRAVEL_HIGHT))
 
-    # Move print head to mossaic
+    # Move tile to mossaic
     delta = TILE_SIZE + TILE_SPACING
     gcode.travel_absolute((SAFE_RANGE['x']['MIN']+col*delta, SAFE_RANGE['y']['MIN']+row*delta, SAFE_RANGE['z']['MIN']))
 
-def is_clear(z):
-    return z >= SAFE_RANGE['z']['MIN'] + FEEDER_CLEARANCE
+    # return to feeder
+    gcode.travel((0,0,PUSHER_TRAVEL_HIGHT))
+    gcode.travel_absolute((SAFE_RANGE['x']['MAX'],SAFE_RANGE['y']['MIN'],PUSHER_TRAVEL_HIGHT+SAFE_RANGE['z']['MIN']), feedrate=6000)
 
 def main():
     os.makedirs(BUILD_DIR, exist_ok=True)
@@ -81,9 +86,6 @@ def main():
     
     for i, row in enumerate(MOSSAIC):
         for j, tile_index in enumerate(row):
-            if not is_clear(g.get_z()):
-                g.travel((0,0,FEEDER_CLEARANCE+SAFE_RANGE["z"]["MIN"]-g.get_z()))
-            g.travel_absolute((DESPENSER_COORD[0], DESPENSER_COORD[1],g.get_z()), feedrate=3000)
             despense_tile(g, tile_index)
             move_to_mossaic(g, i, j)
 
