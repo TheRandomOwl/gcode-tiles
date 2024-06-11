@@ -36,7 +36,6 @@ def setup(gcode):
     # home print head skip z if already homed to save time
     gcode.file.write("G28 X Y\n")
     gcode.file.write("G28 O\n")
-    gcode.file.write("M420 S1\n")
 
     # prepare the print head and give time to attach the pusher
     gcode.travel_absolute((141.8,Y_MAX,PUSHER_TRAVEL_HIGHT+Z_MIN))
